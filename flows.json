@@ -1,0 +1,178 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "024921c30607af25",
+        "type": "OpcUa-Endpoint",
+        "name": "Test",
+        "endpoint": "opc.tcp://host.docker.internal:4840/UA/Machine",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "fd44a9822a316ab9",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Entré 2 secondes",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 230,
+        "y": 500,
+        "wires": [
+            [
+                "d910c5235198e8a0",
+                "c3f2054bf488d959",
+                "b9618e160ae562d0",
+                "6fb8b92e11a14849"
+            ]
+        ]
+    },
+    {
+        "id": "d910c5235198e8a0",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=1;s=Temperature",
+        "datatype": "Double",
+        "value": "",
+        "name": "Témpérature",
+        "x": 490,
+        "y": 420,
+        "wires": [
+            [
+                "c76597fc1b780f70"
+            ]
+        ]
+    },
+    {
+        "id": "c76597fc1b780f70",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "024921c30607af25",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "",
+        "applicationName": "",
+        "applicationUri": "",
+        "x": 800,
+        "y": 520,
+        "wires": [
+            [
+                "dabe1bd56b325458"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "dabe1bd56b325458",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "c3f2054bf488d959",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=1;s=Vibration",
+        "datatype": "Double",
+        "value": "",
+        "name": "Vibration",
+        "x": 480,
+        "y": 480,
+        "wires": [
+            [
+                "c76597fc1b780f70"
+            ]
+        ]
+    },
+    {
+        "id": "b9618e160ae562d0",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=1;s=Courant",
+        "datatype": "Double",
+        "value": "",
+        "name": "Courant",
+        "x": 480,
+        "y": 540,
+        "wires": [
+            [
+                "c76597fc1b780f70"
+            ]
+        ]
+    },
+    {
+        "id": "6fb8b92e11a14849",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=1;s=Heures",
+        "datatype": "Double",
+        "value": "",
+        "name": "Heures",
+        "x": 480,
+        "y": 600,
+        "wires": [
+            [
+                "c76597fc1b780f70"
+            ]
+        ]
+    },
+    {
+        "id": "274d3589c6f9cef9",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-opcua": "0.2.355"
+        }
+    }
+]
