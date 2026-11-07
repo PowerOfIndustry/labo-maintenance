@@ -96,7 +96,7 @@
         "y": 520,
         "wires": [
             [
-                "dabe1bd56b325458"
+                "c5703763ad05845a"
             ],
             [],
             []
@@ -115,7 +115,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1040,
+        "x": 1220,
         "y": 520,
         "wires": []
     },
@@ -168,7 +168,27 @@
         ]
     },
     {
-        "id": "274d3589c6f9cef9",
+        "id": "c5703763ad05845a",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "Évaluer seuils",
+        "func": "const seuils = {\n  \"ns=1;s=Temperature\": { alerte: 71.5, alarme: 78,   h: 1.5 },\n  \"ns=1;s=Vibration\":   { alerte: 2.75, alarme: 3.0,  h: 0.1 },\n  \"ns=1;s=Courant\":     { alerte: 14.3, alarme: 15.6, h: 0.3 },\n  \"ns=1;s=Heures\":      { alerte: 0.8333, alarme: 1.0, h: 0 }\n};\n\nconst s = seuils[msg.topic];\nif (!s) {\n  node.warn(`Aucun seuil défini pour ${msg.topic}`);\n  return null;\n}\n\nconst v = msg.payload;\nconst etats = context.get(\"etats\") || {};\nconst precedent = etats[msg.topic] || \"NORMAL\";\n\nlet niveau = \"NORMAL\";\nif (v >= s.alarme) niveau = \"ALARME\";\nelse if (v >= s.alerte) niveau = \"ALERTE\";\n\n// Hystérésis : on ne redescend que si on passe sous (seuil - h)\nif (precedent === \"ALARME\" && niveau !== \"ALARME\" && v > s.alarme - s.h) niveau = \"ALARME\";\nif (precedent !== \"NORMAL\" && niveau === \"NORMAL\" && v > s.alerte - s.h) niveau = \"ALERTE\";\n\netats[msg.topic] = niveau;\ncontext.set(\"etats\", etats);\n\nmsg.niveau = niveau;\nmsg.payload = `${msg.topic.split(\"=\").pop()} = ${v.toFixed(2)} → ${niveau}`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 520,
+        "wires": [
+            [
+                "dabe1bd56b325458"
+            ]
+        ]
+    },
+    {
+        "id": "957dbb755ab7d383",
         "type": "global-config",
         "env": [],
         "modules": {
