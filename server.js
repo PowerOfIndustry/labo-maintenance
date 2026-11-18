@@ -8,6 +8,13 @@ const { OPCUAServer, Variant, DataType } = require("node-opcua");
   const ns = addressSpace.getOwnNamespace();
   const machine = ns.addObject({ organizedBy: addressSpace.rootFolder.objects, browseName: "Machine1" });
   const DERIVE = process.argv.includes("--derive");
+
+if (DERIVE) {
+  console.log("Dérive activée");
+  } else {
+  console.log("Dérive non activée");
+  }
+
   const TAUX = 0.02;      // +2 % par "heure simulée"
   const ACCEL = 60;       // 1 s réelle = 1 min simulée (à toi de régler)
   let temp = 60, vib = 2.0, courant = 12, pression = 5, heures = 0;

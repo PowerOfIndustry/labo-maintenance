@@ -20,6 +20,16 @@
         "userprivatekey": ""
     },
     {
+        "id": "a0a26e61a4913d1c",
+        "type": "mongodb",
+        "hostname": "mongodb",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": 27017,
+        "db": "labo",
+        "name": ""
+    },
+    {
         "id": "fd44a9822a316ab9",
         "type": "inject",
         "z": "f6f2187d.f17ca8",
@@ -40,7 +50,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 230,
+        "x": 90,
         "y": 500,
         "wires": [
             [
@@ -60,11 +70,12 @@
         "datatype": "Double",
         "value": "",
         "name": "Température",
-        "x": 490,
+        "x": 350,
         "y": 420,
         "wires": [
             [
-                "c76597fc1b780f70"
+                "c76597fc1b780f70",
+                "ab48b3c8391f913d"
             ]
         ]
     },
@@ -93,11 +104,11 @@
         "name": "",
         "applicationName": "",
         "applicationUri": "",
-        "x": 800,
+        "x": 660,
         "y": 520,
         "wires": [
             [
-                "c5703763ad05845a"
+                "03e8c2d891f10a23"
             ],
             [],
             []
@@ -107,7 +118,7 @@
         "id": "dabe1bd56b325458",
         "type": "debug",
         "z": "f6f2187d.f17ca8",
-        "name": "debug 1",
+        "name": "Changements d’état",
         "active": true,
         "tosidebar": true,
         "console": false,
@@ -116,7 +127,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1220,
+        "x": 2220,
         "y": 520,
         "wires": []
     },
@@ -128,11 +139,12 @@
         "datatype": "Double",
         "value": "",
         "name": "Vibration",
-        "x": 480,
+        "x": 340,
         "y": 480,
         "wires": [
             [
-                "c76597fc1b780f70"
+                "c76597fc1b780f70",
+                "ab48b3c8391f913d"
             ]
         ]
     },
@@ -144,11 +156,12 @@
         "datatype": "Double",
         "value": "",
         "name": "Courant",
-        "x": 480,
+        "x": 340,
         "y": 540,
         "wires": [
             [
-                "c76597fc1b780f70"
+                "c76597fc1b780f70",
+                "ab48b3c8391f913d"
             ]
         ]
     },
@@ -160,11 +173,12 @@
         "datatype": "Double",
         "value": "",
         "name": "Heures",
-        "x": 480,
-        "y": 720,
+        "x": 340,
+        "y": 660,
         "wires": [
             [
-                "c76597fc1b780f70"
+                "c76597fc1b780f70",
+                "ab48b3c8391f913d"
             ]
         ]
     },
@@ -173,18 +187,19 @@
         "type": "function",
         "z": "f6f2187d.f17ca8",
         "name": "Évaluer seuils",
-        "func": "const seuils = {\n  \"ns=1;s=Temperature\": { alerte: 71.5, alarme: 78,   h: 1.5 },\n  \"ns=1;s=Vibration\":   { alerte: 2.75, alarme: 3.0,  h: 0.1 },\n  \"ns=1;s=Courant\":     { alerte: 14.3, alarme: 15.6, h: 0.3 },\n  \"ns=1;s=Pression\": { alerte: 6.3, alarme: 6.8, h: 0.3 },\n  \"ns=1;s=Heures\": { alerte: 0.8333, alarme: 1.0, h: 0 }\n}\n\n\nconst s = seuils[msg.topic];\nif (!s) {\n  node.warn(`Aucun seuil défini pour ${msg.topic}`);\n  return null;\n}\n\nconst v = msg.payload;\nconst etats = context.get(\"etats\") || {};\nconst precedent = etats[msg.topic] || \"NORMAL\";\n\nlet niveau = \"NORMAL\";\nif (v >= s.alarme) niveau = \"ALARME\";\nelse if (v >= s.alerte) niveau = \"ALERTE\";\n\nif (precedent === \"ALARME\" && niveau !== \"ALARME\" && v > s.alarme - s.h) niveau = \"ALARME\";\nif (precedent !== \"NORMAL\" && niveau === \"NORMAL\" && v > s.alerte - s.h) niveau = \"ALERTE\";\n\netats[msg.topic] = niveau;\ncontext.set(\"etats\", etats);\n\nmsg.niveau = niveau;\nmsg.payload = `${msg.topic.split(\"=\").pop()} = ${v.toFixed(2)} → ${niveau}`;\nreturn msg;",
+        "func": "const seuils = {\n  \"ns=1;s=Temperature\": { alerte: 71.5, alarme: 78,   h: 1.5 },\n  \"ns=1;s=Vibration\":   { alerte: 2.75, alarme: 3.0,  h: 0.15 },\n  \"ns=1;s=Courant\":     { alerte: 15.5, alarme: 16, h: 0.3 },\n  \"ns=1;s=Pression\": { alerte: 6.3, alarme: 6.8, h: 0.3 },\n  \"ns=1;s=Heures\": { alerte: 450, alarme: 500, h: 0 }\n}\n\n\nconst s = seuils[msg.topic];\nif (!s) {\n  node.warn(`Aucun seuil défini pour ${msg.topic}`);\n  return null;\n}\n\nconst v = msg.payload;\nconst etats = context.get(\"etats\") || {};\nconst precedent = etats[msg.topic] || \"NORMAL\";\n\nlet niveau = \"NORMAL\";\nif (v >= s.alarme) niveau = \"ALARME\";\nelse if (v >= s.alerte) niveau = \"ALERTE\";\n\nif (precedent === \"ALARME\" && niveau !== \"ALARME\" && v > s.alarme - s.h) niveau = \"ALARME\";\nif (precedent !== \"NORMAL\" && niveau === \"NORMAL\" && v > s.alerte - s.h) niveau = \"ALERTE\";\n\n\n\n\n\netats[msg.topic] = niveau;\ncontext.set(\"etats\", etats);\n\nmsg.niveau = niveau;\nmsg.payload = `${msg.topic.split(\"=\").pop()} = ${v.toFixed(2)} → ${niveau}`;\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1040,
+        "x": 1240,
         "y": 520,
         "wires": [
             [
-                "dabe1bd56b325458"
+                "c79c2f388dcc389f",
+                "414a1e4c064f17ba"
             ]
         ]
     },
@@ -196,20 +211,755 @@
         "datatype": "Double",
         "value": "",
         "name": "Pression",
-        "x": 480,
-        "y": 620,
+        "x": 340,
+        "y": 600,
         "wires": [
             [
-                "c76597fc1b780f70"
+                "c76597fc1b780f70",
+                "ab48b3c8391f913d"
             ]
         ]
     },
     {
-        "id": "9c7f1140f56f8419",
+        "id": "03e8c2d891f10a23",
+        "type": "smooth",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "property": "payload",
+        "action": "mean",
+        "count": "10",
+        "round": "",
+        "mult": "multi",
+        "reduce": false,
+        "x": 1000,
+        "y": 520,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "c79c2f388dcc389f",
+        "type": "rbe",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "niveau",
+        "topi": "topic",
+        "x": 1450,
+        "y": 520,
+        "wires": [
+            [
+                "dabe1bd56b325458"
+            ]
+        ]
+    },
+    {
+        "id": "414a1e4c064f17ba",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Toutes valeurs",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1980,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "730027d2e3d0fa4f",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Temp 75",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Temperature",
+        "payload": "75",
+        "payloadType": "num",
+        "x": 790,
+        "y": 20,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "d567f6592e096397",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Temp 80",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Temperature",
+        "payload": "80",
+        "payloadType": "num",
+        "x": 790,
+        "y": 60,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "7ab80075b750e0e5",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Temp 77",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Temperature",
+        "payload": "77",
+        "payloadType": "num",
+        "x": 790,
+        "y": 100,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "94d97db0fde38265",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Temp 71",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Temperature",
+        "payload": "71",
+        "payloadType": "num",
+        "x": 790,
+        "y": 140,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "ceff38bf08365da4",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Temp 69",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Temperature",
+        "payload": "69",
+        "payloadType": "num",
+        "x": 790,
+        "y": 180,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "03d19e70fc0339bb",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Vibration 2.8",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Vibration",
+        "payload": "2.8",
+        "payloadType": "num",
+        "x": 800,
+        "y": 360,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "c452b231a6d3972e",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Vibration 2.76",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Vibration",
+        "payload": "2.76",
+        "payloadType": "num",
+        "x": 810,
+        "y": 240,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "bea31ff1a4275691",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Vibration 3.1",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Vibration",
+        "payload": "3.1",
+        "payloadType": "num",
+        "x": 800,
+        "y": 280,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "6e1fb50b2510dda7",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Vibration 2.9",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Vibration",
+        "payload": "2.9",
+        "payloadType": "num",
+        "x": 800,
+        "y": 320,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "9eb53676f2f2a7cd",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Vibration 2.59",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Vibration",
+        "payload": "2.59",
+        "payloadType": "num",
+        "x": 810,
+        "y": 400,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "14e3c7b4513f2d37",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Courant 15.5",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Courant",
+        "payload": "15.5",
+        "payloadType": "num",
+        "x": 1230,
+        "y": 940,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "8341b79d1b843dc6",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Courant 15.6",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Courant",
+        "payload": "15.6",
+        "payloadType": "num",
+        "x": 1230,
+        "y": 820,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "2b9b814f9f088aed",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Courant 16.3",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Courant",
+        "payload": "16.3",
+        "payloadType": "num",
+        "x": 1230,
+        "y": 860,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "d0f69eecb531752a",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Courant 15.8",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Courant",
+        "payload": "15.8",
+        "payloadType": "num",
+        "x": 1230,
+        "y": 900,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "061a3c6ef9f885b8",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Courant 15.1",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Courant",
+        "payload": "15.1",
+        "payloadType": "num",
+        "x": 1230,
+        "y": 980,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "e16d406e2c1b4b92",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test heures 499",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Heures",
+        "payload": "499",
+        "payloadType": "num",
+        "x": 1220,
+        "y": 1160,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "1c6c6477485aa486",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Heures 451",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Heures",
+        "payload": "451",
+        "payloadType": "num",
+        "x": 1220,
+        "y": 1040,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "70d245978a5a4a57",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Heures 505",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Heures",
+        "payload": "505",
+        "payloadType": "num",
+        "x": 1220,
+        "y": 1080,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "a28322f44dad0165",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test heures 506",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Heures",
+        "payload": "506",
+        "payloadType": "num",
+        "x": 1220,
+        "y": 1120,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "c45c847bea45bbb7",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Test Courant 300",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=Heures",
+        "payload": "300",
+        "payloadType": "num",
+        "x": 1220,
+        "y": 1200,
+        "wires": [
+            [
+                "c5703763ad05845a"
+            ]
+        ]
+    },
+    {
+        "id": "4c8f0c15e68ea040",
+        "type": "mongodb out",
+        "z": "f6f2187d.f17ca8",
+        "mongodb": "a0a26e61a4913d1c",
+        "name": "",
+        "collection": "mesures",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "insert",
+        "x": 790,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "ab48b3c8391f913d",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "024921c30607af25",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "",
+        "applicationName": "",
+        "applicationUri": "",
+        "x": 440,
+        "y": 900,
+        "wires": [
+            [
+                "63cd766ae3116374"
+            ],
+            [
+                "37f90c563a2bb3b5"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "63cd766ae3116374",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "{\"variable\": browseName, \"valeur\": payload, \"horodatage\": $millis()}",
+        "targetType": "jsonata",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 820,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "37f90c563a2bb3b5",
+        "type": "change",
+        "z": "f6f2187d.f17ca8",
+        "name": "Préparer document",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\"variable\": browseName, \"valeur\": payload, \"horodatage\": $millis()}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 1040,
+        "wires": [
+            [
+                "4c8f0c15e68ea040"
+            ]
+        ]
+    },
+    {
+        "id": "b0ba4532848b799a",
         "type": "global-config",
         "env": [],
         "modules": {
-            "node-red-contrib-opcua": "0.2.355"
+            "node-red-contrib-opcua": "0.2.355",
+            "node-red-node-mongodb": "0.2.5",
+            "node-red-node-smooth": "0.1.2"
         }
     }
 ]

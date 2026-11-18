@@ -1,4 +1,18 @@
 services:
+  
+  simulateur:
+    image: node:22
+    container_name: simulateur
+    hostname: simulateur
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: sh -c "npm install && node server.js --derive"
+    ports:
+      - "4840:4840"
+    restart: unless-stopped
+
   nodered:
     image: nodered/node-red
     container_name: nodered
@@ -8,6 +22,7 @@ services:
       - nodered_data:/data
     depends_on:
       - mongodb
+      - simulateur
     restart: unless-stopped
 
   mongodb:
